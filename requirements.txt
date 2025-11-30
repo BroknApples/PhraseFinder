@@ -1,4 +1,4 @@
-kagglehub
 numpy
 opencv-python
 torch
+trdg

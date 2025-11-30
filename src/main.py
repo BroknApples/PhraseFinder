@@ -1,6 +1,12 @@
 import os
-from utilities import (
-  downloadAndSaveKaggleDataset
+import numpy
+import cv2
+import torch
+from trdg.generators import (
+  GeneratorFromDict,
+  GeneratorFromRandom,
+  GeneratorFromStrings,
+  GeneratorFromWikipedia,
 )
 
 
@@ -13,11 +19,7 @@ def main() -> int:
   """
 
   # Download the dataset.
-  KAGGLE_DATASET_PATH: str = "vaibhao/handwritten-characters"
-  DATASET_SAVE_PATH: str = "../data"
-  if not downloadAndSaveKaggleDataset(DATASET_SAVE_PATH, KAGGLE_DATASET_PATH):
-    print(f"Error: Could not acuire Kaggle dataset with params: ({DATASET_SAVE_PATH}, {KAGGLE_DATASET_PATH})")
-    return -1
+  KAGGLE_DATASET_PATH: str = 
   
   
   return 0
