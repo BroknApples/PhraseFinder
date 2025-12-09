@@ -2,7 +2,7 @@
 Generate synthetic text images from a list of phrases.
 
 Usage:
-  python src/gen_images.py <dict_path.txt> <output_dirname> <images_per_phrase>
+  python scripts/gen_images.py <dict_path.txt> <output_dirname> <images_per_phrase>
 
 Arguments:
   dict_path.txt       File containing phrases, one per line.
@@ -10,8 +10,7 @@ Arguments:
   images_per_phrase   Number of images to generate per phrase.
 
 Description:
-  Reads phrases from the given file and generates a dataset of text images
-  (train/ and val/) using TRDG. Returns 0 on success, -1 on failure.
+  Reads phrases from the given file and generates a dataset of text images.
 """
 
 import sys

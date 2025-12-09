@@ -17,7 +17,6 @@ if __name__ == "__main__":
 
 
 import os
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3" # In case TensorFlow is installed, clean up the output
 
 import re
 import time
@@ -63,7 +62,6 @@ def _generateBatch(config: dict, words: list[str], output_dir: str) -> int:
   
   # ---------- Create the generator ----------
   
-  print(f"\n--- Running Batch: {config['name']} ({config['count']} variations per word) ---")
   start = time.time()
   
   # Initialize the generator with batch-specific parameters
@@ -264,8 +262,9 @@ def generateDataset(dict_path: str, output_dir: str, images_per_word: int) -> bo
   print("\n****** Generating validation dataset: ******", end='')
   print("\n********************************************")
   word_ids.clear() # Reset word_ids
-  for word in words:
-    for config in BATCH_CONFIGS:
+  for config in BATCH_CONFIGS:
+    print(f"\n--- Running Batch: {config['name']} ({config['count']} variations per word) ---")
+    for word in words:
       _generateBatch(config, [word], os.path.join(output_dir, VALIDATION_DIRNAME))
     
   end_time = time.time()

@@ -1,17 +1,18 @@
 """
 
 
-Usage: python src/text_detect.py <image_path>
+Usage: python scripts/text_detect.py <image_path>
 """
 
 
 import sys
 import os
-import numpy
-import cv2
-import torch
 
-from east_text_detection import (
+# Add project root to sys.path so "src" can be imported
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT)
+
+from src.east_text_detection import (
   detectTextBBFromImage,
   detectTextBBFromImages,
 )
