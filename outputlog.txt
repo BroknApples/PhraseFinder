@@ -1,0 +1,340 @@
+(venv) PS H:\Dev\Image2Text> python scripts/train_crnn.py data/crnn true
+2025-12-10 19:05:25.520853: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-12-10 19:05:27.836891: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+Error: TensorFlow did not detect any GPU.
+Loaded 9450 training samples.
+Loaded 1890 validation samples.
+2025-12-10 19:05:33.334751: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Starting training...
+Epoch 1/65
+WARNING:tensorflow:From H:\Dev\Image2Text\venv\Lib\site-packages\keras\src\legacy\backend.py:654: The name tf.nn.ctc_loss is deprecated. Please use tf.compat.v1.nn.ctc_loss instead.
+
+2025-12-10 19:05:38.723270: E tensorflow/core/util/util.cc:131] oneDNN supports DT_INT32 only on platforms with AVX-512. Falling back to the default Eigen-based implementation if present.
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 189ms/step - loss: 27.3380  
+Epoch 1: val_loss improved from None to 16.24537, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 66s 204ms/step - loss: 18.5811 - val_loss: 16.2454
+Epoch 2/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 199ms/step - loss: 16.3481 
+Epoch 2: val_loss improved from 16.24537 to 16.02216, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 63s 212ms/step - loss: 16.1528 - val_loss: 16.0222
+Epoch 3/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 190ms/step - loss: 16.1248
+Epoch 3: val_loss improved from 16.02216 to 15.67726, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 60s 201ms/step - loss: 15.8765 - val_loss: 15.6773
+Epoch 4/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 203ms/step - loss: 15.5830
+Epoch 4: val_loss improved from 15.67726 to 15.26965, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 64s 216ms/step - loss: 15.5881 - val_loss: 15.2696
+Epoch 5/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 200ms/step - loss: 15.2772 
+Epoch 5: val_loss improved from 15.26965 to 14.81585, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 63s 211ms/step - loss: 15.2023 - val_loss: 14.8159
+Epoch 6/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 201ms/step - loss: 14.9810 
+Epoch 6: val_loss improved from 14.81585 to 14.40772, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 63s 213ms/step - loss: 14.8689 - val_loss: 14.4077
+Epoch 7/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 241ms/step - loss: 14.5366
+Epoch 7: val_loss improved from 14.40772 to 14.06005, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 78s 263ms/step - loss: 14.4796 - val_loss: 14.0600
+Epoch 8/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 316ms/step - loss: 14.2595
+Epoch 8: val_loss improved from 14.06005 to 13.68657, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 100s 337ms/step - loss: 14.1455 - val_loss: 13.6866
+Epoch 9/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 223ms/step - loss: 13.8736  
+Epoch 9: val_loss improved from 13.68657 to 13.31748, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 71s 238ms/step - loss: 13.8498 - val_loss: 13.3175
+Epoch 10/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 217ms/step - loss: 13.6729  
+Epoch 10: val_loss improved from 13.31748 to 12.86881, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 69s 231ms/step - loss: 13.5269 - val_loss: 12.8688
+Epoch 11/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 227ms/step - loss: 13.2622  
+Epoch 11: val_loss improved from 12.86881 to 12.49197, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 71s 241ms/step - loss: 13.1700 - val_loss: 12.4920
+Epoch 12/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 224ms/step - loss: 12.8272  
+Epoch 12: val_loss improved from 12.49197 to 11.76357, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 71s 239ms/step - loss: 12.6800 - val_loss: 11.7636
+Epoch 13/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 224ms/step - loss: 12.2843  
+Epoch 13: val_loss improved from 11.76357 to 11.21826, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 71s 239ms/step - loss: 12.1885 - val_loss: 11.2183
+Epoch 14/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 226ms/step - loss: 11.8489  
+Epoch 14: val_loss improved from 11.21826 to 10.38348, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 71s 240ms/step - loss: 11.6345 - val_loss: 10.3835
+Epoch 15/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 226ms/step - loss: 11.0733  
+Epoch 15: val_loss improved from 10.38348 to 9.44826, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 71s 241ms/step - loss: 10.9663 - val_loss: 9.4483
+Epoch 16/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 227ms/step - loss: 10.3450 
+Epoch 16: val_loss improved from 9.44826 to 8.59982, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 72s 243ms/step - loss: 10.2624 - val_loss: 8.5998
+Epoch 17/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 228ms/step - loss: 9.6143   
+Epoch 17: val_loss improved from 8.59982 to 7.89401, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 72s 244ms/step - loss: 9.5292 - val_loss: 7.8940
+Epoch 18/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 232ms/step - loss: 8.9468  
+Epoch 18: val_loss improved from 7.89401 to 6.86565, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 73s 247ms/step - loss: 8.7006 - val_loss: 6.8656
+Epoch 19/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 232ms/step - loss: 8.0265  
+Epoch 19: val_loss improved from 6.86565 to 5.68900, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 72s 245ms/step - loss: 7.8538 - val_loss: 5.6890
+Epoch 20/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 225ms/step - loss: 7.1074  
+Epoch 20: val_loss improved from 5.68900 to 4.85344, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 71s 241ms/step - loss: 7.0582 - val_loss: 4.8534
+Epoch 21/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 230ms/step - loss: 6.4498  
+Epoch 21: val_loss improved from 4.85344 to 4.07517, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 73s 246ms/step - loss: 6.3429 - val_loss: 4.0752
+Epoch 22/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 236ms/step - loss: 5.8282  
+Epoch 22: val_loss improved from 4.07517 to 3.58743, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 74s 251ms/step - loss: 5.7041 - val_loss: 3.5874
+Epoch 23/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 248ms/step - loss: 5.1261
+Epoch 23: val_loss improved from 3.58743 to 3.01365, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 77s 262ms/step - loss: 5.0956 - val_loss: 3.0137
+Epoch 24/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 227ms/step - loss: 4.5988
+Epoch 24: val_loss improved from 3.01365 to 2.50427, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 72s 242ms/step - loss: 4.5085 - val_loss: 2.5043
+Epoch 25/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 233ms/step - loss: 4.1161 
+Epoch 25: val_loss improved from 2.50427 to 2.28279, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 73s 247ms/step - loss: 4.1110 - val_loss: 2.2828
+Epoch 26/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 227ms/step - loss: 3.6955  
+Epoch 26: val_loss improved from 2.28279 to 1.93869, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 72s 244ms/step - loss: 3.7367 - val_loss: 1.9387
+Epoch 27/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 235ms/step - loss: 3.4160  
+Epoch 27: val_loss improved from 1.93869 to 1.67747, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 74s 250ms/step - loss: 3.4093 - val_loss: 1.6775
+Epoch 28/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 234ms/step - loss: 3.1610  
+Epoch 28: val_loss improved from 1.67747 to 1.53534, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 74s 250ms/step - loss: 3.0895 - val_loss: 1.5353
+Epoch 29/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 260ms/step - loss: 2.8355  
+Epoch 29: val_loss improved from 1.53534 to 1.36001, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 82s 277ms/step - loss: 2.8203 - val_loss: 1.3600
+Epoch 30/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 264ms/step - loss: 2.5586  
+Epoch 30: val_loss improved from 1.36001 to 1.26772, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 83s 280ms/step - loss: 2.5544 - val_loss: 1.2677
+Epoch 31/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 245ms/step - loss: 2.3687  
+Epoch 31: val_loss improved from 1.26772 to 1.14976, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 77s 261ms/step - loss: 2.3711 - val_loss: 1.1498
+Epoch 32/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 252ms/step - loss: 2.2064  
+Epoch 32: val_loss improved from 1.14976 to 1.14515, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 79s 268ms/step - loss: 2.1787 - val_loss: 1.1452
+Epoch 33/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 262ms/step - loss: 1.9699  
+Epoch 33: val_loss improved from 1.14515 to 1.04703, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 82s 277ms/step - loss: 2.0235 - val_loss: 1.0470
+Epoch 34/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 249ms/step - loss: 1.8414  
+Epoch 34: val_loss improved from 1.04703 to 1.00876, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 78s 264ms/step - loss: 1.8796 - val_loss: 1.0088
+Epoch 35/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 250ms/step - loss: 1.6792  
+Epoch 35: val_loss improved from 1.00876 to 0.97935, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 78s 265ms/step - loss: 1.6825 - val_loss: 0.9793
+Epoch 36/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 268ms/step - loss: 1.5608  
+Epoch 36: val_loss improved from 0.97935 to 0.77548, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 84s 286ms/step - loss: 1.6253 - val_loss: 0.7755
+Epoch 37/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 274ms/step - loss: 1.5531  
+Epoch 37: val_loss improved from 0.77548 to 0.76891, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 87s 293ms/step - loss: 1.5062 - val_loss: 0.7689
+Epoch 38/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 277ms/step - loss: 1.3185  
+Epoch 38: val_loss improved from 0.76891 to 0.70884, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 88s 296ms/step - loss: 1.3353 - val_loss: 0.7088
+Epoch 39/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 279ms/step - loss: 1.2076  
+Epoch 39: val_loss improved from 0.70884 to 0.68582, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 87s 295ms/step - loss: 1.2604 - val_loss: 0.6858
+Epoch 40/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 274ms/step - loss: 1.3338  
+Epoch 40: val_loss did not improve from 0.68582
+296/296 ━━━━━━━━━━━━━━━━━━━━ 86s 291ms/step - loss: 1.3135 - val_loss: 0.7159
+Epoch 41/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 260ms/step - loss: 1.1562  
+Epoch 41: val_loss improved from 0.68582 to 0.63975, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 82s 277ms/step - loss: 1.1567 - val_loss: 0.6398
+Epoch 42/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 262ms/step - loss: 1.2003  
+Epoch 42: val_loss did not improve from 0.63975
+296/296 ━━━━━━━━━━━━━━━━━━━━ 83s 280ms/step - loss: 1.2831 - val_loss: 0.6593
+Epoch 43/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 285ms/step - loss: 1.0338  
+Epoch 43: val_loss did not improve from 0.63975
+296/296 ━━━━━━━━━━━━━━━━━━━━ 89s 302ms/step - loss: 1.0169 - val_loss: 0.6762
+Epoch 44/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 278ms/step - loss: 1.0257  
+Epoch 44: val_loss improved from 0.63975 to 0.63625, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 88s 296ms/step - loss: 1.0320 - val_loss: 0.6362
+Epoch 45/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 282ms/step - loss: 0.9379  
+Epoch 45: val_loss improved from 0.63625 to 0.54163, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 90s 303ms/step - loss: 0.9433 - val_loss: 0.5416
+Epoch 46/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 275ms/step - loss: 0.9225  
+Epoch 46: val_loss did not improve from 0.54163
+296/296 ━━━━━━━━━━━━━━━━━━━━ 87s 294ms/step - loss: 0.8603 - val_loss: 0.5492
+Epoch 47/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 298ms/step - loss: 0.8874  
+Epoch 47: val_loss did not improve from 0.54163
+296/296 ━━━━━━━━━━━━━━━━━━━━ 94s 317ms/step - loss: 0.8992 - val_loss: 0.5806
+Epoch 48/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 293ms/step - loss: 0.8795  
+Epoch 48: val_loss did not improve from 0.54163
+296/296 ━━━━━━━━━━━━━━━━━━━━ 92s 310ms/step - loss: 0.8729 - val_loss: 0.5744
+Epoch 49/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 278ms/step - loss: 0.8559  
+Epoch 49: val_loss did not improve from 0.54163
+296/296 ━━━━━━━━━━━━━━━━━━━━ 88s 297ms/step - loss: 0.8384 - val_loss: 0.5843
+Epoch 50/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 295ms/step - loss: 0.7226  
+Epoch 50: val_loss improved from 0.54163 to 0.51872, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 316ms/step - loss: 0.7082 - val_loss: 0.5187
+Epoch 51/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 284ms/step - loss: 0.7614  
+Epoch 51: val_loss did not improve from 0.51872
+296/296 ━━━━━━━━━━━━━━━━━━━━ 90s 303ms/step - loss: 0.7519 - val_loss: 0.5542
+Epoch 52/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 303ms/step - loss: 0.7251  
+Epoch 52: val_loss did not improve from 0.51872
+296/296 ━━━━━━━━━━━━━━━━━━━━ 95s 319ms/step - loss: 0.7062 - val_loss: 0.5296
+Epoch 53/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.6622  
+Epoch 53: val_loss did not improve from 0.51872
+296/296 ━━━━━━━━━━━━━━━━━━━━ 94s 316ms/step - loss: 0.6878 - val_loss: 0.5284
+Epoch 54/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 286ms/step - loss: 0.8962  
+Epoch 54: val_loss did not improve from 0.51872
+296/296 ━━━━━━━━━━━━━━━━━━━━ 91s 306ms/step - loss: 0.7657 - val_loss: 0.5207
+Epoch 55/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 297ms/step - loss: 0.5576
+Epoch 55: val_loss did not improve from 0.51872
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 316ms/step - loss: 0.5974 - val_loss: 0.5571
+Epoch 56/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 291ms/step - loss: 0.7043
+Epoch 56: val_loss improved from 0.51872 to 0.49069, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 92s 311ms/step - loss: 0.7156 - val_loss: 0.4907
+Epoch 57/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 294ms/step - loss: 0.6134
+Epoch 57: val_loss did not improve from 0.49069
+296/296 ━━━━━━━━━━━━━━━━━━━━ 92s 311ms/step - loss: 0.6286 - val_loss: 0.5002
+Epoch 58/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 295ms/step - loss: 0.6101
+Epoch 58: val_loss did not improve from 0.49069
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.6161 - val_loss: 0.5145
+Epoch 59/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 287ms/step - loss: 0.6484  
+Epoch 59: val_loss did not improve from 0.49069
+296/296 ━━━━━━━━━━━━━━━━━━━━ 90s 304ms/step - loss: 0.6423 - val_loss: 0.4935
+Epoch 60/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 295ms/step - loss: 0.5958  
+Epoch 60: val_loss improved from 0.49069 to 0.45797, saving model to models/crnn.weights.h5
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 316ms/step - loss: 0.5829 - val_loss: 0.4580
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 62/65
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 62/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 290ms/step - loss: 0.6333
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 62/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 290ms/step - loss: 0.6333
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 62/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 290ms/step - loss: 0.6333
+Epoch 62: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 91s 308ms/step - loss: 0.5730 - val_loss: 0.4865
+Epoch 63/65
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 62/65
+Epoch 61/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 296ms/step - loss: 0.5535
+Epoch 61: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 62/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 290ms/step - loss: 0.6333
+296/296 ━━━━━━━━━━━━━━━━━━━━ 93s 314ms/step - loss: 0.5374 - val_loss: 0.5157
+Epoch 62/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 290ms/step - loss: 0.6333
+Epoch 62: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 91s 308ms/step - loss: 0.5730 - val_loss: 0.4865
+Epoch 63/65
+Epoch 62/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 290ms/step - loss: 0.6333
+Epoch 62: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 91s 308ms/step - loss: 0.5730 - val_loss: 0.4865
+Epoch 63/65
+Epoch 62: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 91s 308ms/step - loss: 0.5730 - val_loss: 0.4865
+Epoch 63/65
+Epoch 63/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 289ms/step - loss: 0.5473
+Epoch 63: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 92s 309ms/step - loss: 0.5125 - val_loss: 0.4745
+Epoch 64/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 312ms/step - loss: 0.6119
+Epoch 64: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 97s 329ms/step - loss: 0.6140 - val_loss: 0.4783
+Epoch 65/65
+296/296 ━━━━━━━━━━━━━━━━━━━━ 0s 281ms/step - loss: 0.6296
+Epoch 65: val_loss did not improve from 0.45797
+296/296 ━━━━━━━━━━━━━━━━━━━━ 88s 299ms/step - loss: 0.5737 - val_loss: 0.4631
+Loading best weights from models/crnn.weights.h5...
+Training complete. FINAL PREDICTOR MODEL saved as models/crnn_predictor.keras
+Operation did no complete properly. Error detected.

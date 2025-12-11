@@ -20,7 +20,7 @@ MAX_LABEL_LEN: Final = 16 # max characters per word
 NUM_CLASSES: Final = len(CHARS) + 1 # +1 for CTC blank
 MODELS_DIR: Final = "models/"
 BATCH_SIZE: Final = 32
-NUM_EPOCHS: Final = 65 # High value is fine, EarlyStopping handles the stop point
+NUM_EPOCHS: Final = 150
 
 CHAR_TO_IDX = {c: i for i, c in enumerate(CHARS)}
 IDX_TO_CHAR = {i: c for c, i in CHAR_TO_IDX.items()}
@@ -30,12 +30,12 @@ IDX_TO_CHAR = {i: c for c, i in CHAR_TO_IDX.items()}
 # GPUs
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
-  print(f"Success! TensorFlow found the GPU(s): {gpus}")
+  print(f"TensorFlow found the GPU(s): {gpus}")
   # Optional: Set memory growth to prevent the GPU from grabbing all VRAM at once
   for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 else:
-    print("Error: TensorFlow did not detect any GPU.")
+  print("TensorFlow did not detect any GPU.")
 
 # -------------------- Dataset Preparation --------------------
 # --- FIX encode_word ---
@@ -110,14 +110,14 @@ def build_crnn_model():
   x = layers.Bidirectional(layers.LSTM(128, return_sequences=True, dropout=0.2))(x)
   x = layers.Bidirectional(layers.LSTM(128, return_sequences=True, dropout=0.2))(x)
 
-  # Output (Softmax over all characters + blank)
+  # Output -- Softmax over all characters + blank
   y_pred = layers.Dense(NUM_CLASSES, activation="softmax", name="y_pred")(x)
 
   # 1. Prediction Model (The one for inference)
   prediction_model = keras.Model(
-      inputs=input_img,
-      outputs=y_pred,
-      name='crnn_predictor'
+    inputs=input_img,
+    outputs=y_pred,
+    name='crnn_predictor'
   )
 
   # 2. Training Model (For CTC Loss and fitting)
@@ -136,79 +136,91 @@ def build_crnn_model():
   )
   training_model.compile(optimizer="adam", loss=lambda y_true, y_pred: y_pred) # Dummy loss
 
-  return {'training': training_model, 'prediction': prediction_model} # <-- Return both
+  return {
+    "training": training_model,
+    "prediction": prediction_model
+  }
 
 # -------------------- Training --------------------
 def train_crnn(base_data_dir: str, model_name: str, plot_history: bool = False):
+  
+  # 1. Load Training and Validation Data
+  train_dir = os.path.join(base_data_dir, "train")
+  val_dir = os.path.join(base_data_dir, "val")
+  
+  if not os.path.isdir(train_dir) or not os.path.isdir(val_dir):
+    raise FileNotFoundError(f"Error: Ensure 'train/' and 'val/' directories exist under {base_data_dir}")
+
+  train_dataset = prepare_dataset(train_dir)
+  val_dataset = prepare_dataset(val_dir)
+  print(f"Loaded {len(train_dataset['images'])} training samples.")
+  print(f"Loaded {len(val_dataset['images'])} validation samples.")
+  
+  # 2. Build Models
+  models = build_crnn_model()
+  training_model = models['training']
+  prediction_model = models['prediction'] # The model we will save at the end
+
+  # Paths
+  os.makedirs(MODELS_DIR, exist_ok=True)
+  checkpoint_weights_path = os.path.join(MODELS_DIR, (model_name + ".weights.h5"))
+  final_predictor_path = os.path.join(MODELS_DIR, (model_name + "_predictor.keras"))
+
+  if os.path.exists(checkpoint_weights_path):
+    print(f"\nResuming training: Loading existing weights from {checkpoint_weights_path}...")
+    try:
+      training_model.load_weights(checkpoint_weights_path)
+    except Exception as e:
+      print(f"Error loading weights: {e}. Starting fresh.")
+
+  # 3. Callbacks
+  early_stop = EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True)
+  checkpoint = ModelCheckpoint(
+    checkpoint_weights_path, 
+    monitor="val_loss", 
+    save_weights_only=True, # Saves only the weights of the *training* model
+    save_best_only=True, 
+    verbose=1
+  )
+
+  # Prepare inputs/outputs (outputs are dummies for CTC)
+  train_inputs = [train_dataset["images"], train_dataset["labels"], train_dataset["input_lens"], train_dataset["label_lens"]]
+  train_outputs = np.zeros((len(train_dataset["images"]), 1)) 
+
+  val_inputs = [val_dataset["images"], val_dataset["labels"], val_dataset["input_lens"], val_dataset["label_lens"]]
+  val_outputs = np.zeros((len(val_dataset["images"]), 1))
+
+  # 4. Training (This is your 15-minute step)
+  print("Starting training...")
+  history = training_model.fit(
+    x=train_inputs,
+    y=train_outputs,
+    batch_size=BATCH_SIZE,
+    epochs=NUM_EPOCHS,
+    validation_data=(val_inputs, val_outputs),
+    callbacks=[early_stop, checkpoint]
+  )
+  
+  # 5. Final Save
+  # The training model was restored to its best weights by EarlyStopping.
+  # Load those best weights from the checkpoint file into the prediction model structure.
+  print(f"Loading best weights from {checkpoint_weights_path}...")
+  prediction_model.load_weights(checkpoint_weights_path)
+  
+  # Save the final, usable prediction model
+  prediction_model.save(final_predictor_path)
+  print(f"Training complete. FINAL PREDICTOR MODEL saved as {final_predictor_path}")
+
+  if plot_history:
+    plt.plot(history.history["loss"], label="train_loss")
+    plt.plot(history.history["val_loss"], label="val_loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("CRNN Training Loss")
+    plt.legend()
+    plt.show()
     
-    # 1. Load Training and Validation Data
-    train_dir = os.path.join(base_data_dir, "train")
-    val_dir = os.path.join(base_data_dir, "val")
-    
-    if not os.path.isdir(train_dir) or not os.path.isdir(val_dir):
-        raise FileNotFoundError(f"Ensure 'train/' and 'val/' directories exist under {base_data_dir}")
-
-    train_dataset = prepare_dataset(train_dir)
-    val_dataset = prepare_dataset(val_dir)
-    print(f"Loaded {len(train_dataset['images'])} training samples.")
-    print(f"Loaded {len(val_dataset['images'])} validation samples.")
-    
-    # 2. Build Models
-    models = build_crnn_model()
-    training_model = models['training']
-    prediction_model = models['prediction'] # The model we will save at the end
-
-    # Paths
-    os.makedirs(MODELS_DIR, exist_ok=True)
-    checkpoint_weights_path = os.path.join(MODELS_DIR, (model_name + "_best_weights.keras"))
-    final_predictor_path = os.path.join(MODELS_DIR, (model_name + "_predictor.keras"))
-
-    # 3. Callbacks
-    early_stop = EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True)
-    checkpoint = ModelCheckpoint(
-        checkpoint_weights_path, 
-        monitor="val_loss", 
-        save_weights_only=True, # Saves only the weights of the *training* model
-        save_best_only=True, 
-        verbose=1
-    )
-
-    # Prepare inputs/outputs (outputs are dummies for CTC)
-    train_inputs = [train_dataset["images"], train_dataset["labels"], train_dataset["input_lens"], train_dataset["label_lens"]]
-    train_outputs = np.zeros((len(train_dataset["images"]), 1)) 
-
-    val_inputs = [val_dataset["images"], val_dataset["labels"], val_dataset["input_lens"], val_dataset["label_lens"]]
-    val_outputs = np.zeros((len(val_dataset["images"]), 1))
-
-    # 4. Training (This is your 15-minute step)
-    print("Starting training...")
-    history = training_model.fit(
-        x=train_inputs,
-        y=train_outputs,
-        batch_size=BATCH_SIZE,
-        epochs=NUM_EPOCHS,
-        validation_data=(val_inputs, val_outputs),
-        callbacks=[early_stop, checkpoint]
-    )
-    
-    # 5. Final Save
-    # The training model was restored to its best weights by EarlyStopping.
-    # Load those best weights from the checkpoint file into the prediction model structure.
-    print(f"Loading best weights from {checkpoint_weights_path}...")
-    prediction_model.load_weights(checkpoint_weights_path)
-    
-    # Save the final, usable prediction model
-    prediction_model.save(final_predictor_path)
-    print(f"Training complete. FINAL PREDICTOR MODEL saved as {final_predictor_path}")
-
-    if plot_history:
-        plt.plot(history.history["loss"], label="train_loss")
-        plt.plot(history.history["val_loss"], label="val_loss")
-        plt.xlabel("Epoch")
-        plt.ylabel("Loss")
-        plt.title("CRNN Training Loss")
-        plt.legend()
-        plt.show()
+  return True
 
 # -------------------- Example --------------------
 if __name__ == "__main__":
