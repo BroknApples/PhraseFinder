@@ -1,5 +1,3 @@
 __pycache__/
 venv/
-data/*
-!data/
-!data/*.zip
+data/
