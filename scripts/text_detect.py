@@ -167,7 +167,7 @@ def main(argc: int, argv: list[str]) -> int:
       for tup in results:
         (x1, y1, x2, y2), word_list = tup
         word_string = word_list[0]
-        #print(f"{(x1, y1, x2, y2)} : {word}")
+        #print(f"{(x1, y1, x2, y2)} : {word_string}")
         
         # Draw Bounding Box
         cv2.rectangle(copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
@@ -184,7 +184,7 @@ def main(argc: int, argv: list[str]) -> int:
         if not word or avg_conf < MIN_OCR_CONFIDENCE:
           continue
             
-        #print(f"[{word}] (Conf: {avg_conf:.2f})")
+        print(f"[{word}] (Conf: {avg_conf:.2f})")
 
         cv2.rectangle(copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(copy, word, (x1, y1 - 10), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)

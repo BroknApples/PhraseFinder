@@ -141,14 +141,14 @@ def buildCrnnModel():
   # Output -- Softmax over all characters + blank
   y_pred = layers.Dense(NUM_CLASSES, activation="softmax", name="y_pred")(x)
 
-  # 1. Prediction Model (The one for inference)
+  # Prediction Model (The one for inference)
   prediction_model = keras.Model(
     inputs=input_img,
     outputs=y_pred,
     name='crnn_predictor'
   )
 
-  # 2. Training Model (For CTC Loss and fitting)
+  # Training Model (For CTC Loss and fitting)
   def ctcLambda(args):
     y_pred, labels, input_len, label_len = args
     # CTC expects (Time_steps, Batch, Classes), but y_pred is (Batch, Time_steps, Classes)

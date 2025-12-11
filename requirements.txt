@@ -2,3 +2,5 @@ numpy
 opencv-python
 Pillow
 easyocr
+tensorflow
+matplotlib
