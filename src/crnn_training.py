@@ -25,6 +25,18 @@ NUM_EPOCHS: Final = 65 # High value is fine, EarlyStopping handles the stop poin
 CHAR_TO_IDX = {c: i for i, c in enumerate(CHARS)}
 IDX_TO_CHAR = {i: c for c, i in CHAR_TO_IDX.items()}
 
+
+
+# GPUs
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  print(f"Success! TensorFlow found the GPU(s): {gpus}")
+  # Optional: Set memory growth to prevent the GPU from grabbing all VRAM at once
+  for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
+else:
+    print("Error: TensorFlow did not detect any GPU.")
+
 # -------------------- Dataset Preparation --------------------
 # --- FIX encode_word ---
 def encode_word(word: str) -> np.ndarray:
