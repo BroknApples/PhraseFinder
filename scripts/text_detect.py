@@ -160,28 +160,31 @@ def main(argc: int, argv: list[str]) -> int:
     copy = image.copy()
 
     # CRNN Model pipeline
+    append: str
     if model_type == CRNN_MODEL_TYPE:
+      append = "crnn"
       results = recognizeTextFromBBs_CustomCRNN(image, boxes, model)
       for tup in results:
         (x1, y1, x2, y2), word_list = tup
         word_string = word_list[0]
-        print(f"{(x1, y1, x2, y2)} : {word}")
+        #print(f"{(x1, y1, x2, y2)} : {word}")
         
         # Draw Bounding Box
         cv2.rectangle(copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(copy, word_string, (x1, y1 - 10), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
     # EASYOCR Model pipeline
     elif model_type == EASYOCR_MODEL_TYPE:
+      append = "easyocr"
       results = recognizeTextFromBBs_EasyOCR(image, boxes)
       for (box, word, avg_conf) in results:
         x1, y1, x2, y2 = box
-        print(f"{(x1, y1, x2, y2)} : {word}")
+        #print(f"{(x1, y1, x2, y2)} : {word}")
         
         # Skip if word is empty or confidence is too low
         if not word or avg_conf < MIN_OCR_CONFIDENCE:
-            continue
+          continue
             
-        print(f"[{word}] (Conf: {avg_conf:.2f})")
+        #print(f"[{word}] (Conf: {avg_conf:.2f})")
 
         cv2.rectangle(copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(copy, word, (x1, y1 - 10), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
