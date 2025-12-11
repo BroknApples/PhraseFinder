@@ -16,8 +16,9 @@ if __name__ == "__main__":
   raise RuntimeError("Do not run this script directly.")
 
 
+import sys
 import os
-
+from contextlib import contextmanager
 import re
 import time
 from typing import Final
@@ -26,11 +27,40 @@ from trdg.generators import (
 )
 
 
+# ---------------- Constants ---------------
+
+# Dirnames
+DICT_DIRECTORY_PATH: Final = "dicts/"
+DATA_DIRECTORY_PATH: Final = "data/"
+TRAINING_DIRNAME: Final = "train/"
+VALIDATION_DIRNAME: Final = "val/"
+
+
+# TRDG vars
+IMG_HEIGHT: Final = 32
+IMG_WIDTH: Final = 256
+TEXT_COLOR: Final = "#282828"
+FONT_PATHS: Final = []
+BG_IMAGE_DIR: Final = "trdg/images/"
+
 # Id counter for each word
 word_ids: dict = {} # { label: id }
 
 
 # ********************** beg Functions ********************** #
+
+@contextmanager
+def suppressOutput():
+  """
+  NOTE: Only used to suppress output from TRDG.
+  """
+  old_stdout = sys.stdout
+  sys.stdout = open(os.devnull, 'w')
+  try:
+    yield
+  finally:
+    sys.stdout.close()
+    sys.stdout = old_stdout
 
 def _generateBatch(config: dict, words: list[str], output_dir: str) -> int:
   """
@@ -52,96 +82,97 @@ def _generateBatch(config: dict, words: list[str], output_dir: str) -> int:
     int : Total number of images generated
   """
   
-  # ---------------- Constants ---------------
-  
-  # TRDG vars
-  IMG_HEIGHT: Final = 32
-  IMG_WIDTH: Final = 256
-  TEXT_COLOR: Final = "#282828"
-  FONT_PATHS: Final = []
-  
   # ---------- Create the generator ----------
   
-  start = time.time()
+  image_count = config["count"]
   
-  # Initialize the generator with batch-specific parameters
-  generator = GeneratorFromStrings(
-    # Core Settings
-    count=config["count"],         
-    strings=words,                        
-    size=IMG_HEIGHT,
-    width=IMG_WIDTH,
-    fit=True,
-    text_color=TEXT_COLOR,
-    fonts=FONT_PATHS,
-    
-    # Augmentation Settings (pulled from the config dictionary)
-    skewing_angle=config.get("skewing_angle", 0),
-    random_skew=config.get("random_skew", False),
-    blur=config.get("blur", 0),
-    random_blur=config.get("random_blur", False),
-    background_type=config.get("background_type", 0),
-    distorsion_type=config.get("distorsion_type", 0),
-    distorsion_orientation=config.get("distorsion_orientation", 0),
-  )
+  # Generation function
+  def gen(saved):
+    with suppressOutput():
+      # Initialize the generator with batch-specific parameters
+      generator = GeneratorFromStrings(
+        # Core Settings
+        count=image_count * 5,
+        strings=words,                        
+        size=IMG_HEIGHT,
+        width=IMG_WIDTH,
+        fit=True,
+        text_color=TEXT_COLOR,
+        fonts=FONT_PATHS,
+        image_dir=BG_IMAGE_DIR,
+        
+        # Augmentation Settings
+        skewing_angle=config.get("skewing_angle", 0), 
+        random_skew=config.get("random_skew", False),
+        blur=config.get("blur", 0),
+        random_blur=config.get("random_blur", False),
+        background_type=config.get("background_type", 0),
+        distorsion_type=config.get("distorsion_type", 0),
+        distorsion_orientation=config.get("distorsion_orientation", 0),
+      )
 
-  # Saving vars
-  saved_count = 0
-  prev_lbl = None
-  save_dir = None
-  
-  
-  def cleanText(text: str) -> str:
-    """
-    Keep letters, numbers, hyphens, underscores, and dots.
-    
-    Parameters
-    ----------
-      text: Text to clean
+      # Saving vars
+      prev_lbl = None
+      save_dir = None
+      
+      
+      def cleanText(text: str) -> str:
+        """
+        Keep letters, numbers, hyphens, underscores, and dots.
+        
+        Parameters
+        ----------
+          text: Text to clean
 
-    Returns
-    -------
-      str: cleaned text
-      
-    -------
-    """
-    cleaned = re.sub(r'[^A-Za-z0-9._-]', '_', text)
-    return cleaned.strip('_')
-    
-  # Loop through the generator and save the images
-  for img, lbl in generator:
-    # Populate word_ids
-    key = cleanText(lbl)
-    if key not in word_ids:
-      word_ids[key] = 1
-    
-    # Choose the filename
-    if key != prev_lbl:
-      # Create new save dir path
-      save_dir = os.path.join(output_dir, key)
-      
-      # Only create the folder if it doesnt exist
-      if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-      prev_lbl = key
-    
-    # Create filename
-    filename = f"sample_{word_ids[key]}.png"
-    word_ids[key] += 1
-    img_path = os.path.join(save_dir, filename)
-    
-    try:
-      img.save(img_path)
-      saved_count += 1
-    except Exception as e:
-      print(f"Error saving image for '{lbl}': {e}")
-    
-    #print(f"Saving {img_path}")
+        Returns
+        -------
+          str: cleaned text
           
+        -------
+        """
+        cleaned = re.sub(r'[^A-Za-z0-9._-]', '_', text)
+        return cleaned.strip('_')
+        
+      # Loop through the generator and save the images
+      for img, lbl in generator:
+        if saved == image_count: return
+
+        # Populate word_ids
+        key = cleanText(lbl)
+        if key not in word_ids:
+          word_ids[key] = 1
+        
+        # Choose the filename
+        if key != prev_lbl:
+          # Create new save dir path
+          save_dir = os.path.join(output_dir, key)
+          
+          # Only create the folder if it doesnt exist
+          if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+          prev_lbl = key
+        
+        # Create filename
+        filename = f"sample_{word_ids[key]}.png"
+        img_path = os.path.join(save_dir, filename)
+        
+        if img is None: continue
+        try:
+          img.save(img_path)
+          word_ids[key] += 1
+          saved += 1
+        except Exception as e:
+          print(f"Error saving image for '{lbl}': {e}")
+        
+        #print(f"Saving {img_path}")
+    return saved
+  
+  start = time.time()
+  saved = gen(0)  
   end = time.time()
   elapsed = end - start
-  print(f"Batch '{config['name']}' completed. Saved {saved_count} images. Elapsed: {elapsed:.4f} s")
-  return saved_count
+  print(f"Batch '{config['name']}' completed. Saved {saved} images. Elapsed: {elapsed:.4f} s")
+  return saved
 
 
 def generateDataset(dict_path: str, output_dir: str, images_per_word: int) -> bool:
@@ -169,18 +200,10 @@ def generateDataset(dict_path: str, output_dir: str, images_per_word: int) -> bo
   if distortion_count < 0:
     distortion_count = int(images_per_word * 0.30)
 
-  # ---------------- Constants ---------------
-
-  # Dirnames
-  DICT_DIRECTORY_PATH: Final = "dicts/"
-  DATA_DIRECTORY_PATH: Final = "data/"
-  TRAINING_DIRNAME: Final = "train/"
-  VALIDATION_DIRNAME: Final = "val/"
-  
   # --- Batch Configurations (Crucial for Variation) ---
   # Sum of "count" must equal IMAGES_PER_word (100 in this example)
   # This list ensures diversity across the 100 generations per word.
-  BATCH_CONFIGS: Final = [
+  TRAIN_BATCH_CONFIGS: Final = [
     # 1. Clean Baseline (30% of data)
     {
       "name": "Clean_Batch",
@@ -197,7 +220,7 @@ def generateDataset(dict_path: str, output_dir: str, images_per_word: int) -> bo
       "count": noise_count,
       "random_blur": True,
       "random_skew": True, 
-      "background_type": 1,
+      "background_type": 3,
       "distorsion_type": 0,
       "blur": 1,
       "skewing_angle": 5
@@ -209,9 +232,32 @@ def generateDataset(dict_path: str, output_dir: str, images_per_word: int) -> bo
       "count": distortion_count,
       "random_blur": False,
       "random_skew": False, 
-      "background_type": 2,
+      "background_type": 3,
       "distorsion_type": 2,
       "distorsion_orientation": 0
+    }
+  ]
+
+  VALID_BATCH_CONFIGS: Final = [
+    # 1. Clean Baseline (60% of data)
+    {
+      "name": "Clean",
+      "count": (int(images_per_word*0.6)/5),
+      "random_blur": False,
+      "random_skew": False,
+      "background_type":0,
+      "distorsion_type":0
+    },
+
+    # 2. Slightly Noisey Set (40% of data)
+    {
+      "name": "Slight_Noise",
+      "count": ((images_per_word - int(images_per_word*0.6))/5),
+      "random_blur": True,
+      "random_skew": False,
+      "background_type": 1,
+      "blur": 1,
+      "skewing_angle": 2
     }
   ]
 
@@ -254,15 +300,16 @@ def generateDataset(dict_path: str, output_dir: str, images_per_word: int) -> bo
   print("\n******************************************", end='')
   print("\n****** Generating training dataset: ******", end='')
   print("\n******************************************")
-  for word in words:
-    for config in BATCH_CONFIGS:
+  for config in TRAIN_BATCH_CONFIGS:
+    print(f"\n--- Running Batch: {config['name']} ({config['count']} variations per word) ---")
+    for word in words:
       _generateBatch(config, [word], os.path.join(output_dir, TRAINING_DIRNAME))
   
   print("\n********************************************", end='')
   print("\n****** Generating validation dataset: ******", end='')
   print("\n********************************************")
   word_ids.clear() # Reset word_ids
-  for config in BATCH_CONFIGS:
+  for config in VALID_BATCH_CONFIGS:
     print(f"\n--- Running Batch: {config['name']} ({config['count']} variations per word) ---")
     for word in words:
       _generateBatch(config, [word], os.path.join(output_dir, VALIDATION_DIRNAME))

@@ -24,10 +24,35 @@ if __name__ == "__main__":
   raise RuntimeError("Do not run this script directly.")
 
 
-import os
 import numpy as np
 import cv2
 from typing import Final
+
+
+# ---------------- Constants ---------------
+
+# Load network
+EAST_MODEL: Final = "models/frozen_east_text_detection.pb"
+EAST = cv2.dnn.readNet(EAST_MODEL)
+
+# Output layer names from EAST
+LAYERS: Final = ["feature_fusion/Conv_7/Sigmoid", "feature_fusion/concat_3"]
+
+# Mean values used in blobbing for the EAST model
+EAST_MEANS: Final = (123.68, 116.78, 103.94)
+
+# Blob scale factor
+BLOB_SCALE_FACTOR: Final = 1.0
+
+# Required size for use by the EAST model; each tier is more accurate, but slower.
+REQ_SIZES: Final = (
+  (320, 320), # Fast and accurate
+  (512, 512), # Slower, but more accurate
+  (640, 640)  # Slow, but very accurate
+)
+
+NMS_SCORE_THRESHOLD = 0.5
+NMS_THRESHOLD  = 0.4
 
 
 # ********************** beg Functions ********************** #
@@ -81,20 +106,26 @@ def _decode(scores: np.ndarray, geometry: np.ndarray, thresh: float = 0.5) -> tu
       start_x = int(end_x - w)
       start_y = int(end_y - h)
 
+      # Clamp
+      start_x = max(0, start_x)
+      start_y = max(0, start_y)
+      end_x = max(0, end_x)
+      end_y = max(0, end_y)
+
       rects.append((start_x, start_y, end_x, end_y))
       confidences.append(float(score))
 
   return rects, confidences
 
 
-def detectTextBBFromImage(path: str, size_type: int = 0, show_img: bool = False, box_color: tuple[int, int, int] = (0, 255, 0), box_thickness: int = 2) -> list[tuple[int, int, int, int]]:
+def detectTextBBFromImage(image: np.ndarray, size_type: int = 0, show_img: bool = False, box_color: tuple[int, int, int] = (0, 255, 0), box_thickness: int = 2) -> list[tuple[int, int, int, int]]:
   """
   Gets the bounding box locations for likely 
   text-regions in an image using the EAST model.
 
   Parameters
   ----------
-    path : Path to the image
+    image: Numpy array for your image
     size_type : Size of the resized images -> 0 = (320, 320), 1 = (512, 512), 2 = (640, 640)
     show_img : Should the image be displayed with bounding boxes before returning?
     box_color : Color to render the boxes as on the image if show_img is set to true
@@ -112,35 +143,10 @@ def detectTextBBFromImage(path: str, size_type: int = 0, show_img: bool = False,
     raise ValueError("size_type must be (0, 1, or 2)")
   elif box_thickness == 0 or box_thickness < -1:
     raise ValueError("box_thickness must be -1 or greater than 0")
-  elif not os.path.exists(path):
-    raise FileNotFoundError(f"Invalid file path [{path}]")
-  
-
-  # ---------------- Constants ---------------
-
-  # Path to the EAST model
-  EAST_MODEL: Final = "models/frozen_east_text_detection.pb"
-
-  # Output layer names from EAST
-  LAYERS: Final = ["feature_fusion/Conv_7/Sigmoid", "feature_fusion/concat_3"]
-
-  # Mean values used in blobbing for the EAST model
-  EAST_MEANS: Final = (123.68, 116.78, 103.94)
-
-  # Blob scale factor
-  BLOB_SCALE_FACTOR: Final = 1.0
-
-  # Required size for use by the EAST model; each tier is more accurate, but slower.
-  REQ_SIZES: Final = (
-    (320, 320), # Fast and accurate
-    (512, 512), # Slower, but more accurate
-    (640, 640)  # Slow, but very accurate
-  )
 
   # ------------- Run EAST model -------------
 
-  # Load image
-  image = cv2.imread(path, cv2.IMREAD_COLOR)
+  # Copy and resize image
   orig = image.copy() # Copy of the original image used for mapping bounding boxes
   image = cv2.resize(image, REQ_SIZES[size_type])
 
@@ -154,18 +160,21 @@ def detectTextBBFromImage(path: str, size_type: int = 0, show_img: bool = False,
     crop=False
   )
 
-  # Load network
-  net = cv2.dnn.readNet(EAST_MODEL)
-
   # Forward pass
-  net.setInput(blob)
-  scores, geometry = net.forward(LAYERS)
+  EAST.setInput(blob)
+  scores, geometry = EAST.forward(LAYERS)
 
   # Decode into boxes
   rects, confidences = _decode(scores, geometry)
 
   # Apply non-max suppression
-  boxes = cv2.dnn.NMSBoxes(rects, confidences, 0.5, 0.4)
+  rects_xywh = []
+  for (x1, y1, x2, y2) in rects:
+    rects_xywh.append([x1, y1, x2 - x1, y2 - y1])
+  boxes = cv2.dnn.NMSBoxes(rects_xywh, confidences, NMS_SCORE_THRESHOLD, NMS_THRESHOLD)
+
+  # Safety check
+  if len(boxes) == 0: return []
 
   # Scale back to original image
   orig_h, orig_w = orig.shape[:2]
@@ -191,14 +200,14 @@ def detectTextBBFromImage(path: str, size_type: int = 0, show_img: bool = False,
   return scaled_boxes
 
 
-def detectTextBBFromImages(paths: list[str], size_type: int = 0, show_img: bool = False, box_color: tuple[int, int, int] = (0, 255, 0), box_thickness: int = 2) -> list[list[tuple[int, int, int, int]]]:
+def detectTextBBFromImages(images: list[np.ndarray], size_type: int = 0, show_img: bool = False, box_color: tuple[int, int, int] = (0, 255, 0), box_thickness: int = 2) -> list[list[tuple[int, int, int, int]]]:
   """
   Gets the bounding box locations for likely 
   text-regions in an image using the EAST model.
 
   Parameters
   ----------
-    paths : List of images to get
+    image : List of loaded images
     size_type : Size of the resized images -> 0 = (320, 320), 1 = (512, 512), 2 = (640, 640)
     show_img : Should the image be displayed with bounding boxes before returning?
     box_color : Color to render the boxes as on the image if show_img is set to true
@@ -211,8 +220,8 @@ def detectTextBBFromImages(paths: list[str], size_type: int = 0, show_img: bool 
   -------
   """
   boxes = []
-  for path in paths:
-    boxes.append(detectTextBBFromImage(path, size_type, show_img, box_color, box_thickness))
+  for image in images:
+    boxes.append(detectTextBBFromImage(image, size_type, show_img, box_color, box_thickness))
   
   return boxes
 
