@@ -3,3 +3,4 @@ opencv-python
 tensorflow
 Pillow
 easyocr
+matplotlib

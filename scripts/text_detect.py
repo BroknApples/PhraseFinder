@@ -16,92 +16,160 @@ from typing import Final
 from tensorflow.keras.models import load_model # type: ignore
 
 from src.east_text_detection import detectTextBBFromImage, detectTextBBFromImages
-from src.crnn_text_identifaction import recognizeTextFromBBs
+from src.custom_crnn_text_recognition import recognizeTextFromBBs_CustomCRNN
+from src.easyocr_text_recognition import recognizeTextFromBBs_EasyOCR
 
+
+CRNN_MODEL_TYPE: Final = "crnn"
+EASYOCR_MODEL_TYPE: Final = "easyocr"
+MIN_OCR_CONFIDENCE: Final = 0.5
+FONT: Final = cv2.FONT_HERSHEY_SIMPLEX
+FONT_SCALE: Final = 0.7
+FONT_COLOR: Final = (255, 0, 0)
+FONT_THICKNESS: Final = 2
+CUSTOM_CRNN_MODEL_PATH: Final = "models/crnn_predictor.keras"
+
+def _sortBoxesReadingOrder(boxes, y_thresh: int = 12):
+  """
+  Sorts boxes by their reading order (top-to-bottom, left-to-right)
+
+  Parameters
+  ----------
+    boxes : List of bounding-box coordinates
+    y_thresh : Threshold for boxes to be considered on the same line
+
+  Returns
+  -------
+    result: List of results
+  
+  -------
+  """
+  
+  # group into lines by y coordinate, then sort within line by x
+  if not boxes:
+    return []
+  
+  boxes_sorted = sorted(boxes, key=lambda b: (b[1], b[0]))
+  lines = []
+  current_line = [boxes_sorted[0]]
+  for b in boxes_sorted[1:]:
+    if abs(b[1] - current_line[0][1]) <= y_thresh:
+      current_line.append(b)
+    else:
+      lines.append(sorted(current_line, key=lambda bb: bb[0]))
+      current_line = [b]
+  lines.append(sorted(current_line, key=lambda bb: bb[0]))
+  
+  # Flatten list of lists back into a single list
+  res = [item for sublist in lines for item in sublist]
+  return res
 
 # ---------- Main ----------
 def main(argc: int, argv: list[str]) -> int:
   """
-  Docstring for main
+  Entry point for generating text images from a phrase list.
+
+  Runs the text detector pipeline
+
+  Parameters
+  ----------
+    argc : Number of command-line arguments provided.
+    argv : List of command-line arguments. Expected order:
+             
+             0: script name
+             
+             1: Name of the file or directory of files to analyze
+
+             3: model to use ("custom" or "easyocr")
+
+             3: Resize parameter for the EAST model
+
+             4: display results once completed
+
+  Returns
+  -------
+    int : Status code: 0 on success, -1 if an error \
+          occurred (e.g., invalid arguments or paths).
   
-  :param argc: Description
-  :type argc: int
-  :param argv: Description
-  :type argv: list[str]
-  :return: Description
-  :rtype: int
+  -------
   """
 
   if argc < 3 or argc > 5:
-    print("Usage: python text_detect.py <image_path> <model_path> [resize] [display_bb]")
+    print("Usage: python text_detect.py <image_path> <model_type> [resize] [display]")
     return -1
 
   image_path = argv[1]
-  model_path = argv[2]
+  model_type = argv[2].lower()
   resize = int(argv[3]) if len(argv) > 3 else 1
-  display_bb = (argv[4].lower() in ("1", "true", "yes")) if len(argv) > 4 else False
+  display = (argv[4].lower() in ("1", "true", "yes")) if len(argv) > 4 else False
 
   if not os.path.exists(image_path):
     print(f"Invalid image path [{image_path}]")
     return -1
-  if not os.path.exists(model_path):
-    print(f"Invalid model path [{model_path}]")
+
+  if model_type != CRNN_MODEL_TYPE and model_type != EASYOCR_MODEL_TYPE:
+    prtin(f"Invalid model_type [{model_type}]")
     return -1
 
   # Load prediction model (CRNN without Lambda)
-  model = load_model(model_path, compile=False)
+  model = None
+  if model_type == CRNN_MODEL_TYPE:
+    model = load_model(CUSTOM_CRNN_MODEL_PATH, compile=False)
 
   # Load image
-  image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-  image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+  def runPipeline(img_path):
+    """
+    Run the full pipeline on an image
 
-  # Detect text boxes
-  boxes = detectTextBBFromImage(image, resize, display_bb)
-
-  results = recognizeTextFromBBs(image, boxes, model)
-
-  # Display results
-  for tup in results:
-    (x1, y1, x2, y2), word = tup
-    print(f"{(x1, y1, x2, y2)} : {word}")
-
-  copy = image.copy()
-  font = cv2.FONT_HERSHEY_SIMPLEX
-  font_scale = 0.5
-  font_thickness = 1
-  
-  for tup in results:
-    (x1, y1, x2, y2), word_list = tup # Rename variable to be clear it's a list
+    Parameters
+    ----------
+      img_path: Path to an image to load
+    """
     
-    # --- FIX IS HERE ---
-    word_string = word_list[0] # Take the string out of the list
-    
-    # 1. Draw Bounding Box (Existing Code)
-    cv2.rectangle(copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    
-    # 2. Draw Text
-    text_x = x1
-    text_y = y1 - 10 if y1 - 10 > 10 else y2 + 20 
-    
-    cv2.putText(
-      copy, 
-      word_string, # Use the string variable
-      (text_x, text_y), 
-      font, 
-      font_scale, 
-      (255, 0, 0), 
-      font_thickness, 
-      cv2.LINE_AA
-    )
+    image = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    if image is None: return # Skip unreadable images
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-  # 3. Show Final Image (New Code)
-  # Convert back to BGR for display/save if image started as BGR
-  # Assuming 'image' was read in BGR originally:
-  copy_bgr = cv2.cvtColor(copy, cv2.COLOR_RGB2BGR) 
-  
-  cv2.imshow("Detection & Recognition Results", copy_bgr)
-  cv2.waitKey(0)
-  cv2.destroyAllWindows()
+    # Detect text boxes & sort
+    boxes = detectTextBBFromImage(image, resize, False)
+    boxes = _sortBoxesReadingOrder(boxes)
+
+    copy = image.copy()
+
+    # CRNN Model pipeline
+    if model_type == CRNN_MODEL_TYPE:
+      results = recognizeTextFromBBs_CustomCRNN(image, boxes, model)
+      for tup in results:
+        print(f"{(x1, y1, x2, y2)} : {word}")
+        (x1, y1, x2, y2), word_list = tup
+        word_string = word_list[0]
+        
+        # Draw Bounding Box
+        cv2.rectangle(copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(copy, word_string, (x1, y1 - 10), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+    # EASYOCR Model pipeline
+    elif model_type == EASYOCR_MODEL_TYPE:
+      results = recognizeTextFromBBs_EasyOCR(image, boxes)
+      for (box, word, avg_conf) in results:
+        x1, y1, x2, y2 = box
+        print(f"{(x1, y1, x2, y2)} : {word}")
+        
+        # Skip if word is empty or confidence is too low
+        if not word or avg_conf < MIN_OCR_CONFIDENCE:
+            continue
+            
+        print(f"[{word}] (Conf: {avg_conf:.2f})")
+
+        cv2.rectangle(copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(copy, word, (x1, y1 - 10), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
+
+    # Print and draw
+    if display:
+      cv2.imshow("Result", copy)
+      cv2.waitKey(0)
+      cv2.destroyAllWindows()
+
+  runPipeline(image_path)
 
   return 0
 

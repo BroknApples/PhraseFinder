@@ -49,6 +49,8 @@ def main(argc: int, argv: list[str]) -> int:
   -------
     int : Status code: 0 on success, -1 if an error \
           occurred (e.g., invalid arguments or paths).
+    
+  -------
   """
 
   # Bounds checks

@@ -12,8 +12,8 @@ import os
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT)
 
-from src.crnn_training import (
-  train_crnn
+from src.custom_crnn_training import (
+  trainCustomCrnn
 )
 
 
@@ -38,16 +38,21 @@ def main(argc: int, argv: list[str]) -> int:
   -------
     int : Status code: 0 on success, -1 if an error \
           occurred (e.g., invalid arguments or paths).
+  
+  -------
   """
 
-  if argc < 1 or argc > 3: # Must be 0-2 arguments
-    print("Usage: python train_cnn.py <data_directory> [plot_history]")
+  if argc < 2 or argc > 3: # Must be 1-2 arguments
+    print("Usage: python train_cnn.py <data directory> [plot_history]")
     return -1
   
-  model_name = argv[1] if argc > 1 else "text_classifier"
+  data_dir = argv[1]
   plot_history = (argv[2].lower() in ("1", "true", "yes")) if argc > 2 else False
 
-  if not train_crnn(model_name, "crnn", plot_history):
+  if not data_dir.startswith("data/"):
+    data_dir = os.path.join("data", data_dir)
+
+  if not trainCustomCrnn(data_dir, "crnn", plot_history):
     return -1
   
   return 0
