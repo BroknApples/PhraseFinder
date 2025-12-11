@@ -7,6 +7,7 @@ import os
 import cv2
 import numpy as np
 import tensorflow as tf
+from pathlib import Path
 
 # Add project root to sys.path so "src" can be imported
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -28,6 +29,7 @@ FONT_SCALE: Final = 0.7
 FONT_COLOR: Final = (255, 0, 0)
 FONT_THICKNESS: Final = 2
 CUSTOM_CRNN_MODEL_PATH: Final = "models/crnn_predictor.keras"
+IMAGE_EXTENSIONS: Final = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff'] # Common image extensions
 
 def _sortBoxesReadingOrder(boxes, y_thresh: int = 12):
   """
@@ -98,13 +100,13 @@ def main(argc: int, argv: list[str]) -> int:
     print("Usage: python text_detect.py <image_path> <model_type> [resize] [display]")
     return -1
 
-  image_path = argv[1]
+  images_path = argv[1]
   model_type = argv[2].lower()
   resize = int(argv[3]) if len(argv) > 3 else 1
   display = (argv[4].lower() in ("1", "true", "yes")) if len(argv) > 4 else False
 
-  if not os.path.exists(image_path):
-    print(f"Invalid image path [{image_path}]")
+  if not os.path.exists(images_path):
+    print(f"Invalid image path [{images_path}]")
     return -1
 
   if model_type != CRNN_MODEL_TYPE and model_type != EASYOCR_MODEL_TYPE:
@@ -115,6 +117,28 @@ def main(argc: int, argv: list[str]) -> int:
   model = None
   if model_type == CRNN_MODEL_TYPE:
     model = load_model(CUSTOM_CRNN_MODEL_PATH, compile=False)
+
+  # Ensure output dir exists
+  OUTPUT_DIR = Path("out")
+  OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+  # Determine list of image files to process
+  image_paths: List[str] = []
+  
+  if os.path.isdir(images_path):
+    print(f"Processing directory: {images_path}")
+    # Loop through all files in the directory
+    for filename in os.listdir(images_path):
+      if any(filename.lower().endswith(ext) for ext in IMAGE_EXTENSIONS):
+        image_paths.append(os.path.join(images_path, filename))
+    
+    if not image_paths:
+      print(f"No supported image files found in {images_path}")
+      return -1
+
+  elif os.path.isfile(images_path):
+    # Single file case
+    image_paths.append(images_path)
 
   # Load image
   def runPipeline(img_path):
@@ -168,8 +192,15 @@ def main(argc: int, argv: list[str]) -> int:
       cv2.imshow("Result", copy)
       cv2.waitKey(0)
       cv2.destroyAllWindows()
+    
+    base_name = os.path.basename(img_path)
+    name, ext = os.path.splitext(base_name)
+    save_path = OUTPUT_DIR / f"{name}_result.png"
+    cv2.imwrite(str(save_path), copy)
 
-  runPipeline(image_path)
+  # Run pipeline for each image
+  for img_path in image_paths:
+    runPipeline(img_path)
 
   return 0
 

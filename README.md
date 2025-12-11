@@ -110,5 +110,5 @@ python scripts/text_detect.py image1.png crnn 1 true
 ## Examples
 
 *Sample detection results:*  
-![Example 1](path_to_image.png)  
-![Example 2](path_to_image.png)
+![Example 1](readme_data/image1_result.png)  
+![Example 2](readme_data/image2_result.png)
