@@ -95,7 +95,7 @@ python scripts/text_detect.py image1.png crnn 1 true
 - The second argument specifies which model to use: `easyocr` or `crnn`.
 
 *Example detection output:*  
-![Detection Example](path_to_image.png)
+![Detection Example](readme_data/detection_out.png)
 
 ---
 
