@@ -47,7 +47,7 @@ python scripts/gen_dataset.py <dictionary_name.txt> <output_directory> <images_p
 ```
 
 *Example dataset output:*  
-![Dataset Example](readme_data\data_gen.png)
+![Dataset Example](readme_data/data_gen.png)
 
 ---
 
@@ -75,7 +75,7 @@ python scripts/train_crnn.py <data_directory> <model_name>
 - The training process uses EarlyStopping and saves the **best model weights**.
 
 *Example training loss graph:*  
-![Training Loss](readme_data\training_loss.png)
+![Training Loss](readme_data/training_loss.png)
 
 ---
 
