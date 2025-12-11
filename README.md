@@ -1,88 +1,114 @@
-# NAME
-Author: **Trenton Smith** *- cvi16*
+# WordDetector
+**Author:** Trenton Smith (cvi16)
 
+---
 
 ## Overview
+WordDetector detects and recognizes text in images using the **EAST text detector** combined with either:
 
+1. **EasyOCR** (recommended, highly accurate)  
+2. **Custom CRNN** (pretrained, less accurate)
 
+The project also supports generating synthetic datasets for CRNN training.
+
+---
 
 ## Setup
 
-**KNOWN WORKING PYTHON VERSIONS**
-* 3.10.11
-* 3.11.5
+**Known working Python versions:**
+- 3.10.11
+- 3.11.5
 
---------
-
-It is recommended that you use a Python Virtual Environment and install the packages listed in `requirements.txt`
-
-```terminal
+**Install dependencies in a virtual environment:**
+```bash
 python -m venv venv
-venv/Scripts/Activate
+venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
+> ⚠️ Make sure to activate the virtual environment before running any scripts.
 
-## How to Use
+---
 
-This program has two methods of use.
-1. *Run using EAST + EasyOCR*
-  (very accurate)
-2. *Run using EAST + a custom CRNN*
-  (not accurate at all)
+## Generating a Dataset (Optional)
+> ⚠️ Important: Use a separate virtual environment due to TRDG & EasyOCR conflicts.
 
-This project comes with a premade custom CRNN with `val_loss=0.35`
-
-### Generating a dataset
-
-**NOTE: (VERY IMPORTANT) To do this, you must create a seperetae virtual environment as there are package conflicts with trdg & easyocr**
-
-In you virtual environment, run:
-```terminal
+1. Install TRDG & compatible pillow version:
+```bash
 pip install trdg
+pip install Pillow==9.5.0
 ```
 
-Create a dictionary file (a simple text file containing the words you want to generate images for). There is a premade dictionary crnn which trained the premade model.
+2. Create a dictionary file (`dictionary.txt`) listing the words to generate.
 
-```terminal
-python scripts/gen_dataset.py <dictionary_name.txt> <output_directory> <images to generate per word>
+3. Generate images for the dictionary:
+```bash
+python scripts/gen_dataset.py <dictionary_name.txt> <output_directory> <images_per_word>
 ```
 
+*Example dataset output:*  
+![Dataset Example](readme_data\data_gen.png)
 
+---
 
-### Training the custom CRNN
+## Training the Custom CRNN
+> ⚠️ Skip this step if you are using EasyOCR.
 
-**NOTE: If you are using EasyOCR for detection, skip to "Running the text detector"**
-
-**NOTE: This may take many hours (a very long time)**
-
-Run the following python command, where data_directory=`path to the folder containing 'data/' and 'val'`
-When training, upping the Epoch count will lead to a more reliable CRNN.
-
-```terminal
-python scripts/gen_dataset.py <dictionary_name.txt> <output_directory> <images to generate per word>
+1. Make sure your dataset directory contains `train/` and `val/` folders structured like:
+```
+data_dir/
+├── train/
+│   ├── word1/
+│   └── ...
+└── val/
+    ├── word1/
+    └── ...
 ```
 
-Outputted results
-<TODO link image of training loss>
+2. Train the CRNN:
+```bash
+python scripts/train_crnn.py <data_directory> <model_name>
+```
 
-### Running the text detector
+- Training may take several hours.  
+- Increasing epochs may improve accuracy.  
+- The training process uses EarlyStopping and saves the **best model weights**.
 
-*Using EasyOCR (Recommended)*
-```terminal
+*Example training loss graph:*  
+![Training Loss](readme_data\training_loss.png)
+
+---
+
+## Running the Text Detector
+
+**Using EasyOCR (Recommended):**
+```bash
 python scripts/text_detect.py image1.png easyocr 1 true
 ```
 
-OR
-
-*Using the custom CRNN*
-```terminal
+**Using Custom CRNN:**
+```bash
 python scripts/text_detect.py image1.png crnn 1 true
 ```
 
+- The last argument (`true`) specifies whether to display the results in a window.  
+- The second argument specifies which model to use: `easyocr` or `crnn`.
 
+*Example detection output:*  
+![Detection Example](path_to_image.png)
 
+---
+
+## Notes
+
+- The custom CRNN comes pre-trained with `val_loss=0.35`.  
+- Dataset generation is optional but required if you want to train your own CRNN.  
+- EasyOCR provides significantly better accuracy and is easier to use.
+
+---
 
 ## Examples
 
-
+*Sample detection results:*  
+![Example 1](path_to_image.png)  
+![Example 2](path_to_image.png)
